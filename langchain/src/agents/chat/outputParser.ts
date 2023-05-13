@@ -7,7 +7,7 @@ export class ChatAgentOutputParser extends AgentActionOutputParser {
   async parse(text: string) {
     if (text.includes(FINAL_ANSWER_ACTION) || !text.includes(`"action":`)) {
       const parts = text.split(FINAL_ANSWER_ACTION);
-      const output = parts[parts.length - 1].trim();
+      const output = parts[parts.length - 1].trim().replace(/\\n/g, "\n");
       return { returnValues: { output }, log: text } satisfies AgentFinish;
     }
 
@@ -19,7 +19,7 @@ export class ChatAgentOutputParser extends AgentActionOutputParser {
       return {
         tool: response.action,
         toolInput: response.action_input,
-        log: text,
+        log: text.replace(/\\n/g, "\n"),
       };
     } catch {
       throw new Error(
