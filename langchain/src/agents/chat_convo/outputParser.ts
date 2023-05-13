@@ -15,6 +15,8 @@ export class ChatConversationalAgentOutputParser extends AgentActionOutputParser
       jsonOutput = jsonOutput.slice(0, lastIndex).trimEnd();
     }
 
+    jsonOutput = jsonOutput.replace(/\\n/g, "\n"); // Fix for escaped new lines
+
     const response = JSON.parse(jsonOutput);
 
     const { action, action_input } = response;
