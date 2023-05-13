@@ -130,7 +130,9 @@ test("Test run", async () => {
   const db = await SqlDatabase.fromDataSourceParams({
     appDataSource: datasource,
   });
-  const result = await db.run("SELECT * FROM users");
+  const sql = "SELECT * FROM users";
+  const result = await db.run(sql);
+  const intermediateStep = `SQL Query: ${sql}\nResult: ${JSON.stringify(result)}`;
   const expectStr = `[{"id":1,"name":"Alice","age":20},{"id":2,"name":"Bob","age":21},{"id":3,"name":"Charlie","age":22}]`;
   expect(result.trim()).toBe(expectStr.trim());
 });
@@ -140,6 +142,19 @@ test("Test run with error", async () => {
     const db = await SqlDatabase.fromDataSourceParams({
       appDataSource: datasource,
     });
-    await db.run("SELECT * FROM userss");
+    const sql = "SELECT * FROM userss";
+    await db.run(sql);
+    const intermediateStep = `SQL Query: ${sql}\nResult: ${error}`;
   }).rejects.toThrow("SQLITE_ERROR: no such table: userss");
+});
+
+// Additional test to check intermediateStep field
+test("Test intermediateStep field", async () => {
+  const db = await SqlDatabase.fromDataSourceParams({
+    appDataSource: datasource,
+  });
+  const sql = "SELECT * FROM users";
+  const result = await db.run(sql);
+  const intermediateStep = `SQL Query: ${sql}\nResult: ${JSON.stringify(result)}`;
+  expect(db.intermediateStep).toBe(intermediateStep);
 });
