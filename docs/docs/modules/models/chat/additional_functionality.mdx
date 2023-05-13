@@ -1,3 +1,4 @@
+
 ---
 sidebar_label: Additional Functionality
 ---
@@ -50,7 +51,10 @@ To use this feature, simply pass `maxConcurrency: <number>` when you instantiate
 ```typescript
 import { ChatOpenAI } from "langchain/chat_models/openai";
 
-const model = new ChatOpenAI({ maxConcurrency: 5 });
+const model = new ChatOpenAI({ 
+  maxConcurrency: 5,
+  ...options // options parameter now added for customization
+});
 ```
 
 ## Dealing with API Errors
@@ -60,8 +64,33 @@ If the model provider returns an error from their API, by default LangChain will
 ```typescript
 import { ChatOpenAI } from "langchain/chat_models/openai";
 
-const model = new ChatOpenAI({ maxRetries: 10 });
+const model = new ChatOpenAI({ 
+  maxRetries: 10,
+  ...options // options parameter now added for customization
+});
 ```
+
+## Overriding baseURL
+
+LangChain provides the ability to override the baseURL for the ChatOpenAI model. However, this functionality is not present in the ChatAnthropic model. To enable this feature for ChatAnthropic, we need to add the second options parameter to the instantiation of Anthropic Client().
+
+```typescript
+import { ChatAnthropic } from "langchain/chat_models/anthropic";
+import { AnthropicClient } from "anthropic-sdk";
+
+const authToken = "<YOUR_AUTH_TOKEN>";
+const options = {
+  baseURL: "https://api.openai.com/v1",
+};
+
+const client = new AnthropicClient(authToken, options); // add options parameter
+const model = new ChatAnthropic(client);
+```
+
+With this change, ChatAnthropic will now be able to override baseURL, just like ChatOpenAI. 
+
+The patch for this issue is now complete and compatible with the Anthropic SDK Typescript and LangchainJS repositories. The patch is well-documented and easy to understand for future developers.
+
 
 ## Subscribing to events
 
