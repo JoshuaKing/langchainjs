@@ -23,4 +23,19 @@ describe("Worker", () => {
       expect(text.startsWith("Hello")).toBe(true);
     }
   }, 30000);
+
+  it("should fix MemoryVectorStore similaritySearch timeout issue", async () => {
+    const similaritySearch = async () => {
+      try {
+        const data = new TextEncoder().encode("example data");
+        const embeddings = await worker.execute("getEmbeddings", data);
+        return embeddings;
+      } catch (e) {
+        console.error(e);
+        throw new Error("Unable to get embeddings");
+      }
+    };
+    const resp = await similaritySearch();
+    expect(resp).not.toBeNull();
+  });
 });

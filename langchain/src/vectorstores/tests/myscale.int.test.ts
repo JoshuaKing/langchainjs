@@ -5,7 +5,17 @@ import { MyScaleStore } from "../myscale.js";
 import { OpenAIEmbeddings } from "../../embeddings/openai.js";
 import { Document } from "../../document.js";
 
-test.skip("MyScaleStore.fromText", async () => {
+// Patch for MemoryVectorStore similaritySearch timing out due to a "ReferenceError" related to the TextEncoder property not existing.
+
+// Import TextEncoder polyfill
+import { TextEncoder } from "util";
+
+// Define a mock TextEncoder if it doesn't exist
+if (typeof TextEncoder === "undefined") {
+  global.TextEncoder = require("util").TextEncoder;
+}
+
+test("MyScaleStore.fromText", async () => {
   const vectorStore = await MyScaleStore.fromTexts(
     ["Hello world", "Bye bye", "hello nice world"],
     [
@@ -41,7 +51,7 @@ test.skip("MyScaleStore.fromText", async () => {
   ]);
 });
 
-test.skip("MyScaleStore.fromExistingIndex", async () => {
+test("MyScaleStore.fromExistingIndex", async () => {
   await MyScaleStore.fromTexts(
     ["Hello world", "Bye bye", "hello nice world"],
     [

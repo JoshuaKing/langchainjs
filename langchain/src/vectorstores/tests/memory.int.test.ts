@@ -18,7 +18,9 @@ test("MemoryVectorStore with external ids", async () => {
     { pageContent: "what's this", metadata: { a: 1 } },
   ]);
 
-  const results = await store.similaritySearch("hello", 1);
+  const encoder = new TextEncoder(); // Add TextEncoder to encode strings
+
+  const results = await store.similaritySearch(encoder.encode("hello"), 1); // encode query string
 
   expect(results).toHaveLength(1);
 

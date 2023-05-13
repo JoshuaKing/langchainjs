@@ -11,7 +11,10 @@ test.skip("Test Replicate", async () => {
     },
   });
 
-  const res = await model.call("Hello, my name is ");
+  const textEncoder = new TextEncoder();
+  const input = textEncoder.encode("Hello, my name is ");
+
+  const res = await model.call(input);
 
   expect(typeof res).toBe("string");
 });
