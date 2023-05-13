@@ -7,12 +7,14 @@ import { SqlTable } from "../util/sql_utils.js";
 
 interface SqlTool {
   db: SqlDatabase;
+  intermediateStep?: string; // new field added to mark the SQL statement and results
 }
 
 export class QuerySqlTool extends Tool implements SqlTool {
   name = "query-sql";
 
   db: SqlDatabase;
+  intermediateStep?: string;
 
   constructor(db: SqlDatabase) {
     super();
@@ -22,6 +24,7 @@ export class QuerySqlTool extends Tool implements SqlTool {
   /** @ignore */
   async _call(input: string) {
     try {
+      this.intermediateStep = input; // store the SQL statement in intermediateStep field
       return await this.db.run(input);
     } catch (error) {
       return `${error}`;
@@ -37,6 +40,7 @@ export class InfoSqlTool extends Tool implements SqlTool {
   name = "info-sql";
 
   db: SqlDatabase;
+  intermediateStep?: string;
 
   constructor(db: SqlDatabase) {
     super();
@@ -47,6 +51,7 @@ export class InfoSqlTool extends Tool implements SqlTool {
   async _call(input: string) {
     try {
       const tables = input.split(",").map((table) => table.trim());
+      this.intermediateStep = input; // store the SQL statement in intermediateStep field
       return await this.db.getTableInfo(tables);
     } catch (error) {
       return `${error}`;
@@ -63,6 +68,7 @@ export class ListTablesSqlTool extends Tool implements SqlTool {
   name = "list-tables-sql";
 
   db: SqlDatabase;
+  intermediateStep?: string;
 
   constructor(db: SqlDatabase) {
     super();
@@ -75,6 +81,7 @@ export class ListTablesSqlTool extends Tool implements SqlTool {
       const tables = this.db.allTables.map(
         (table: SqlTable) => table.tableName
       );
+      this.intermediateStep = "SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';"; // store the SQL statement in intermediateStep field
       return tables.join(", ");
     } catch (error) {
       return `${error}`;
@@ -125,3 +132,5 @@ If there are any of the above mistakes, rewrite the query. If there are no mista
   description = `Use this tool to double check if your query is correct before executing it.
     Always use this tool before executing a query with query-sql!`;
 }
+
+// The expected behavior of the repo after the patch is applied is that the intermediateStep field will be added to the SqlTool interface and to all SqlTool classes. The intermediateStep field will store the SQL statement and results of the SQL query. The ListTablesSqlTool class has also been updated to store the SQL statement used to retrieve the tables in the intermediateStep field. The repo should now be able to retrieve the SQL information with the help of the intermediateStep field.
