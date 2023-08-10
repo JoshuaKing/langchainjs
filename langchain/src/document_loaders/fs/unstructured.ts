@@ -57,6 +57,7 @@ export type UnstructuredLoaderOptions = {
   coordinates?: boolean;
   pdfInferTableStructure?: boolean;
   xmlKeepTags?: boolean;
+  timeout?: number;
 };
 
 type UnstructuredDirectoryLoaderOptions = UnstructuredLoaderOptions & {
@@ -107,6 +108,7 @@ export class UnstructuredLoader extends BaseDocumentLoader {
       this.coordinates = options.coordinates;
       this.pdfInferTableStructure = options.pdfInferTableStructure;
       this.xmlKeepTags = options.xmlKeepTags;
+      this.timeout = options.timeout;
     }
   }
 

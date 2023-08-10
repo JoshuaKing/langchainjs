@@ -52,6 +52,7 @@ export class CheerioWebBaseLoader
     const { load } = await CheerioWebBaseLoader.imports();
     const response = await caller.call(fetch, url, {
       signal: timeout ? AbortSignal.timeout(timeout) : undefined,
+      timeout: timeout ?? undefined, // add a timeout option to the fetch call
     });
 
     const html =

@@ -20,12 +20,20 @@ const HUB_PATH_REGEX = /lc(@[^:]+)?:\/\/(.*)/;
 
 const URL_PATH_SEPARATOR = "/";
 
+type HubLoaderOptions = {
+  apiKey?: string;
+  apiUrl?: string;
+  strategy?: string;
+  timeout?: number;
+};
+
 export const loadFromHub = async <T>(
   uri: string,
   loader: FileLoader<T>,
   validPrefix: string,
   validSuffixes: Set<string>,
-  values: LoadValues = {}
+  values: LoadValues = {},
+  options: HubLoaderOptions = {}
 ): Promise<T | undefined> => {
   const LANGCHAIN_HUB_DEFAULT_REF =
     getEnvironmentVariable("LANGCHAIN_HUB_DEFAULT_REF") ?? "master";
@@ -49,7 +57,11 @@ export const loadFromHub = async <T>(
   }
 
   const url = [LANGCHAIN_HUB_URL_BASE, ref, remotePath].join("/");
-  const res = await pRetry(() => fetchWithTimeout(url, { timeout: 5000 }), {
+  const fetchOptions: Omit<RequestInit, "signal"> & { timeout: number } = {
+    ...options,
+    timeout: options.timeout ?? 5000,
+  };
+  const res = await pRetry(() => fetchWithTimeout(url, fetchOptions), {
     retries: 6,
   });
   if (res.status !== 200) {
