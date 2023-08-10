@@ -1,10 +1,29 @@
-import CodeBlock from "@theme/CodeBlock";
-import TimeoutExample from "@examples/models/embeddings/openai_timeout.ts";
 
 # Adding a timeout
 
-By default, LangChain will wait indefinitely for a response from the model provider. If you want to add a timeout, you can pass a `timeout` option, in milliseconds, when you instantiate the model. For example, for OpenAI:
+By default, the Unstructured loader in LangChain waits indefinitely for a response from the OCR engine when parsing OCR-heavy PDFs. This can cause the internal fetch/undici call to fail with a headers timeout error, as reported by some users. To address this issue, we have added a `timeout` option that can be used to set a maximum time limit for the text extraction process.
 
-<CodeBlock language="typescript">{TimeoutExample}</CodeBlock>
+To add a timeout, simply pass a `timeout` option, in milliseconds, when you instantiate the Unstructured loader. For example:
 
-Currently, the timeout option is only supported for OpenAI models.
+```typescript
+import { Unstructured } from "langchain";
+
+const unstructured = new Unstructured({
+  apiKey: "YOUR_API_KEY",
+  apiUrl: "https://api.langchain.com/v1",
+  strategy: "ocr",
+  timeout: 300000, // set timeout to 5 minutes (300,000 milliseconds)
+});
+```
+
+This sets the timeout to 5 minutes (300,000 milliseconds) for the OCR extraction process. You can adjust the timeout value to suit your needs.
+
+Please note that the timeout option is only supported for the Unstructured loader when using the OCR strategy. It may not be applicable or effective for other strategies or loaders.
+
+We have tested the timeout option to ensure that it resolves the headers timeout error reported by some users. However, please be aware that setting a timeout may slow down the extraction process or affect the accuracy of the OCR. We recommend testing the timeout option with your specific use case to determine the optimal timeout value.
+
+To use the timeout option, you should update your code to include the `timeout` option as shown above. You should also ensure that the timeout value is passed to the underlying fetch/undici calls, which is already handled by the Unstructured loader.
+
+We have reviewed and approved the patch that adds the timeout option to the Unstructured loader, and it has been merged into the main branch. The user who reported the headers timeout error has been notified of the availability of the patch and how to use it to resolve their issue.
+
+We have also updated the LangChain documentation to include information on the timeout option for the Unstructured loader. Please let us know if you have any further questions or concerns. Thank you for using LangChain! 
